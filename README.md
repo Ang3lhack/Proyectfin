@@ -48,7 +48,7 @@ graph TD
     A -->|Fetch Weather Data| C[Open-Meteo API]
     A -->|Reverse Geocoding| D[Nominatim API]
 
-    B -->|Multimodal Prompt| E[Google Gemini 1.5 Flash]
+    B -->|Multimodal Prompt| E[Google Gemini 2.5 Flash]
     E -->|AI Recommendation| B
 
     B -->|JSON Response| A
