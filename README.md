@@ -72,7 +72,7 @@ graph TD
 - Netlify Functions (Serverless Architecture)
 
 ## AI Engine
-- Google Generative AI (Gemini 1.5 Flash)
+- Google Generative AI (Gemini 2.5 Flash)
 
 ## Database
 - Supabase (PostgreSQL)
