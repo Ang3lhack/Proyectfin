@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAura Ultimate | Feedback & Predictions</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --primary: #6c5ce7; --bg: #f0f2f5; --card: #ffffff; --text: #2d3436; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 950px; width: 100%; }
+        
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; }
+        .title-area h1 { margin: 0; color: var(--primary); font-size: 2.2rem; }
+        .location-text { color: #636e72; font-size: 0.95rem; font-weight: 500; }
+        .time-weather-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        .clock { font-size: 2.5rem; font-weight: bold; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1; }
+        
+        /* TARJETAS DE PRONÓSTICO SEMANAL */
+        .forecast-container { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 20px; }
+        .forecast-card { background: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px 10px; min-width: 90px; text-align: center; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .f-day { font-weight: bold; color: #636e72; text-transform: capitalize; font-size: 0.9rem;}
+        .f-icon { font-size: 1.8rem; }
+        .f-temps { font-size: 0.85rem; font-weight: bold; color: var(--primary); }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { background: #f9f9f9; padding: 20px; border-radius: 15px; border: 1px solid #eee; }
+        .slider-box { margin-bottom: 15px; font-weight: 500; }
+        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+        
+        .vision-box { border: 2px dashed #b2bec3; border-radius: 12px; height: 160px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; cursor: pointer; }
+        #preview-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 25px; transition: 0.2s; }
+        .btn-main:hover { background: #5a4bcf; }
+        .btn-secondary { background: #00b894; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-secondary:hover { background: #00a884; }
+
+        .response-box { margin-top: 20px; padding: 20px; background: #fdfafc; border-left: 5px solid var(--primary); border-radius: 0 10px 10px 0; font-size: 1rem; }
+        
+        /* FEEDBACK (LIKES) */
+        .feedback-area { margin-top: 15px; display: flex; align-items: center; gap: 15px; background: #fff; padding: 10px 15px; border-radius: 30px; display: none; border: 1px solid #eee; width: max-content; }
+        .btn-like { background: none; border: none; font-size: 1.5rem; cursor: pointer; transition: transform 0.2s; }
+        .btn-like:hover { transform: scale(1.2); }
+
+        .history-section { margin-top: 35px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; font-size: 0.9rem; border: 1px solid #f0f0f0; }
+        th { background: #6c5ce7; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="title-area">
+            <h1>SmartAura</h1>
+            <div class="location-text" id="location-text">📍 Detectando tu ubicación...</div>
+        </div>
+        <div class="time-weather-area">
+            <div class="clock" id="live-clock">--:--:--</div>
+        </div>
+    </div>
+
+    <h3 style="color:#636e72; font-size:1rem; margin-top:0;">Pronóstico de la Semana</h3>
+    <div class="forecast-container" id="forecast-cards">Cargando clima...</div>
+
+    <div class="grid">
+        <div class="panel">
+            <h3>Sensores IoT (Simulados)</h3>
+            <div class="slider-box">Temp: <b id="dTemp" style="color:var(--primary)">22</b>°C <input type="range" id="vTemp" min="5" max="40" value="22" oninput="u()"></div>
+            <div class="slider-box">Hum: <b id="dHum" style="color:var(--primary)">50</b>% <input type="range" id="vHum" min="10" max="95" value="50" oninput="u()"></div>
+            <div class="slider-box">Luz: <b id="dLuz" style="color:var(--primary)">300</b>lx <input type="range" id="vLuz" min="0" max="1000" value="300" step="10" oninput="u()"></div>
+        </div>
+        <div class="panel">
+            <h3>Visión Artificial</h3>
+            <div class="vision-box" onclick="document.getElementById('file-in').click()">
+                <span id="ph" style="color:#636e72; font-size:0.9rem;">📸 Click para subir foto</span>
+                <img id="preview-img">
+            </div>
+            <input type="file" id="file-in" style="display:none" accept="image/jpeg, image/png" onchange="p(this)">
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="analizar('actual')">Escanear Ambiente (Tiempo Real)</button>
+    <button class="btn-secondary" onclick="analizar('semanal')">🔮 Generar Lista de Compras de la Semana</button>
+
+    <div class="response-box" id="ia-res"><b>IA:</b> Lista para generar recomendaciones...</div>
+    
+    <div class="feedback-area" id="feedback-box">
+        <span style="font-weight:bold; color:#636e72;">¿Te gustó esta mezcla?</span>
+        <button class="btn-like" onclick="votar(true)">👍</button>
+        <button class="btn-like" onclick="votar(false)">👎</button>
+    </div>
+
+    <div class="history-section">
+        <h3>Historial en la Nube (Supabase)</h3>
+        <table>
+            <thead><tr><th>Fecha</th><th>Int / Ext</th><th>Mezcla Generada</th><th>Gusto</th></tr></thead>
+            <tbody id="historial-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    
+    const S_URL = 'https://fyzdbztxjcaanqgplcpm.supabase.co';
+    const S_KEY = 'sb_publishable_aZq2GKeVLOyobZGhPeRegw_R7BgOcCM';
+    const db = supabase.createClient(S_URL, S_KEY);
+
+    let climaData = "";
+    let ciudadNombre = "";
+    let imgB64 = null;
+    let pronosticoData = []; 
+    let lastRecordId = null; // Guarda el ID del último registro para el feedback
+
+    setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }, 1000);
+
+    function obtenerIconoClima(code, isDay) {
+        const climas = { 0: { d: "☀️", n: "🌙" }, 1: { d: "🌤️", n: "🌤️" }, 2: { d: "⛅", n: "⛅" }, 3: { d: "☁️", n: "☁️" }, 45: { d: "🌫️", n: "🌫️" }, 48: { d: "🌫️", n: "🌫️" }, 51: { d: "🌦️", n: "🌦️" }, 53: { d: "🌧️", n: "🌧️" }, 61: { d: "🌧️", n: "🌧️" }, 63: { d: "🌧️", n: "🌧️" }, 71: { d: "🌨️", n: "🌨️" }, 95: { d: "⛈️", n: "⛈️" } };
+        return isDay ? (climas[code] ? climas[code].d : "🌎") : (climas[code] ? climas[code].n : "🌎");
+    }
+
+    async function init() {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const { latitude, longitude } = pos.coords;
+            try {
+                const geo = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const geoData = await geo.json();
+                ciudadNombre = geoData.address.city || geoData.address.state || "Ubicación Local";
+                document.getElementById('location-text').innerText = "📍 " + ciudadNombre;
+            } catch(e) {}
+
+            try {
+                // Obtenemos clima de 7 días
+                const w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
+                const wData = await w.json();
+                
+                climaData = `${wData.current_weather.temperature}°C`;
+                
+                // Renderizar Tarjetas de Pronóstico
+                let tarjetasHTML = '';
+                for(let i=0; i<7; i++) {
+                    const diaTxt = new Date(wData.daily.time[i] + 'T12:00:00').toLocaleDateString('es-MX', {weekday: 'short'});
+                    const icono = obtenerIconoClima(wData.daily.weathercode[i], true);
+                    const max = wData.daily.temperature_2m_max[i];
+                    const min = wData.daily.temperature_2m_min[i];
+                    
+                    pronosticoData.push({ dia: diaTxt, clima_codigo: wData.daily.weathercode[i], max, min });
+                    
+                    tarjetasHTML += `
+                    <div class="forecast-card">
+                        <div class="f-day">${diaTxt}</div>
+                        <div class="f-icon">${icono}</div>
+                        <div class="f-temps">${max}° / ${min}°</div>
+                    </div>`;
+                }
+                document.getElementById('forecast-cards').innerHTML = tarjetasHTML;
+            } catch(e) { document.getElementById('forecast-cards').innerHTML = "Error cargando clima"; }
+        });
+        cargarHistorial();
+    }
+
+    function u() {
+        document.getElementById('dTemp').innerText = document.getElementById('vTemp').value;
+        document.getElementById('dHum').innerText = document.getElementById('vHum').value;
+        document.getElementById('dLuz').innerText = document.getElementById('vLuz').value;
+    }
+
+    function p(input) {
+        if (input.files[0]) {
+            const r = new FileReader();
+            r.onload = e => { 
+                imgB64 = e.target.result;
+                document.getElementById('preview-img').src = imgB64;
+                document.getElementById('preview-img').style.display='block';
+                document.getElementById('ph').style.display='none';
+            };
+            r.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // EXTRAER GUSTOS DE SUPABASE PARA LA IA
+    async function obtenerGustos() {
+        const { data } = await db.from('historial_aura').select('mezcla_ia').eq('gusto', true).limit(4);
+        if (!data || data.length === 0) return null;
+        return data.map(d => d.mezcla_ia).join(" | ");
+    }
+
+    async function analizar(modo) {
+        document.getElementById('feedback-box').style.display = 'none';
+        const resBox = document.getElementById('ia-res');
+        resBox.innerHTML = `<b>IA:</b> Evaluando parámetros y consultando memoria de preferencias...`;
+        
+        const gustosPrevios = await obtenerGustos();
+
+        const payload = {
+            tipo: modo,
+            temp: document.getElementById('vTemp').value,
+            hum: document.getElementById('vHum').value,
+            luz: document.getElementById('vLuz').value,
+            imageBase64: modo === 'actual' ? imgB64 : null,
+            climaExt: climaData,
+            ciudad: ciudadNombre,
+            hora: new Date().toLocaleTimeString(),
+            pronosticoSemanal: pronosticoData,
+            gustosPrevios: gustosPrevios
+        };
+
+        try {
+            const res = await fetch('/.netlify/functions/aroma', { method: 'POST', body: JSON.stringify(payload) });
+            const resData = await res.json();
+            
+            // Convertir saltos de línea de la IA a HTML
+            const textoLimpio = resData.mezcla.replace(/\n/g, '<br>');
+            resBox.innerHTML = `<b>${modo === 'semanal' ? 'Planificación Semanal' : 'Mezcla en Tiempo Real'}:</b> <br><br> ${textoLimpio}`;
+
+            // Guardar y recuperar el ID generado para habilitar la votación
+            if(modo === 'actual') {
+                const { data, error } = await db.from('historial_aura').insert([{ 
+                    temperatura: parseInt(payload.temp), humedad: parseInt(payload.hum), luz: parseInt(payload.luz), mezcla_ia: resData.mezcla 
+                }]).select(); // .select() devuelve la fila creada
+                
+                if(data && data.length > 0) {
+                    lastRecordId = data[0].id;
+                    document.getElementById('feedback-box').style.display = 'flex'; // Mostrar botones de Like
+                }
+            }
+            cargarHistorial();
+        } catch (e) { resBox.innerHTML = `<b style="color:red">Error:</b> ${e.message}`; }
+    }
+
+    // FUNCIÓN PARA GUARDAR EL FEEDBACK EN SUPABASE
+    async function votar(isLike) {
+        if(!lastRecordId) return;
+        document.getElementById('feedback-box').innerHTML = `<span style="font-weight:bold; color:var(--primary);">¡Preferencia guardada en la base de datos! La IA lo recordará.</span>`;
+        await db.from('historial_aura').update({ gusto: isLike }).eq('id', lastRecordId);
+        cargarHistorial();
+    }
+
+    async function cargarHistorial() {
+        const body = document.getElementById('historial-body');
+        const { data } = await db.from('historial_aura').select('*').order('fecha', { ascending: false }).limit(5);
+        if (data) {
+            body.innerHTML = data.map(r => {
+                const f = new Date(r.fecha).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' });
+                let emojiGusto = r.gusto === true ? "👍" : (r.gusto === false ? "👎" : "➖");
+                return `<tr>
+                    <td style="font-weight:bold;">${f}</td>
+                    <td>${r.temperatura}°C / ${climaData}</td>
+                    <td>${r.mezcla_ia ? r.mezcla_ia.substring(0, 50) : ""}...</td>
+                    <td style="text-align:center; font-size:1.2rem;">${emojiGusto}</td>
+                </tr>`;
+            }).join('');
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
