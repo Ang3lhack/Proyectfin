@@ -1,88 +1,213 @@
-SmartAura: AI-Driven IoT Environment Intelligence System 🌿✨
-Live Demo: https://fanciful-lollipop-cf1874.netlify.app/
+# SmartAura: AI-Driven IoT Environment Intelligence System 🌿✨
 
-📌 Project Overview
-SmartAura is a sophisticated Digital Twin IoT Ecosystem designed to harmonize indoor environments through Artificial Intelligence and real-time data. Developed for the Internet Programming course, this project bypasses the need for physical hardware by simulating IoT sensor nodes (Temperature, Humidity, Light) and combining them with external environmental factors (Local Weather, Location, Time) and Computer Vision.
+**Live Demo:**  
+https://fanciful-lollipop-cf1874.netlify.app/
 
-The core objective is to provide a personalized wellbeing experience, recommending specific fragrance blends (essential oils) based on the user's immediate surroundings and personal preferences, stored in a cloud-based historical database.
+---
 
-🚀 Key Features
-Digital Twin IoT Simulation: Interactive sliders representing real-time sensor data (Temp, Hum, Lux).
+# 📌 Project Overview
 
-Multimodal AI Vision: Integration with Google Gemini 1.5 Flash to analyze room aesthetics and style from uploaded photos.
+SmartAura is a sophisticated **Digital Twin IoT Ecosystem** designed to harmonize indoor environments through Artificial Intelligence and real-time data.
 
-Global Context Integration: Real-time fetching of local weather data and geolocation via Open-Meteo and Nominatim APIs.
+Developed for the Internet Programming course, this project simulates IoT sensor nodes (Temperature, Humidity, and Light) without requiring physical hardware. It combines simulated sensor data with external environmental factors such as local weather, geolocation, time, and computer vision analysis.
 
-Intelligent Feedback Loop: A "Like/Dislike" system that allows the AI to learn and adapt to user fragrance preferences over time.
+The main objective is to deliver a personalized wellbeing experience by recommending fragrance blends (essential oils) based on the user's environment and personal preferences stored in a cloud-based historical database.
 
-Weekly Predictive Planning: AI-generated shopping lists and fragrance schedules based on 7-day weather forecasts.
+---
 
-Cloud Persistence: Full integration with Supabase for historical logging and preference memory.
+# 🚀 Key Features
 
-🏗️ System Architecture
-The following diagram illustrates the data flow between the client, the serverless backend, and the specialized APIs:
+- **Digital Twin IoT Simulation**  
+  Interactive sliders representing real-time sensor data (Temperature, Humidity, and Lux).
 
+- **Multimodal AI Vision**  
+  Integration with Google Gemini 1.5 Flash for analyzing room aesthetics and interior style from uploaded images.
+
+- **Global Context Integration**  
+  Real-time weather and geolocation data using Open-Meteo and Nominatim APIs.
+
+- **Intelligent Feedback Loop**  
+  Like/Dislike system that enables AI adaptation based on user fragrance preferences.
+
+- **Weekly Predictive Planning**  
+  AI-generated fragrance schedules and shopping lists using 7-day weather forecasts.
+
+- **Cloud Persistence**  
+  Full Supabase integration for historical logs and preference memory.
+
+---
+
+# 🏗️ System Architecture
+
+The following diagram illustrates the interaction between the frontend, backend, APIs, and AI services:
+
+```mermaid
 graph TD
-    A[User / Frontend UI] -->|Manual Input / Photo| B[Netlify Functions - Node.js]
-    A -->|Fetch Local Weather| C[Open-Meteo API]
+    A[User / Frontend UI] -->|Manual Input / Photo Upload| B[Netlify Functions - Node.js]
+
+    A -->|Fetch Weather Data| C[Open-Meteo API]
     A -->|Reverse Geocoding| D[Nominatim API]
+
     B -->|Multimodal Prompt| E[Google Gemini 1.5 Flash]
     E -->|AI Recommendation| B
+
     B -->|JSON Response| A
+
     A -->|Persist Data / Feedback| F[Supabase Database]
     F -->|Historical Context| B
-🛠️ Tech Stack
-Frontend: Vanilla JavaScript (ES6+), HTML5, CSS3 (Modern UI/UX with Glassmorphism).
+```
 
-Backend: Node.js hosted on Netlify Functions (Serverless Architecture).
+---
 
-AI Engine: Google Generative AI (Gemini 1.5 Flash).
+# 🛠️ Tech Stack
 
-Database: Supabase (PostgreSQL) for high-performance data persistence.
+## Frontend
+- Vanilla JavaScript (ES6+)
+- HTML5
+- CSS3
+- Modern Glassmorphism UI/UX
 
-Deployment: Continuous Integration via GitHub & Netlify.
+## Backend
+- Node.js
+- Netlify Functions (Serverless Architecture)
 
-📋 Installation & Local Development
-Prerequisites
-Node.js (v18 or higher)
+## AI Engine
+- Google Generative AI (Gemini 1.5 Flash)
 
-Netlify CLI (npm install -g netlify-cli)
+## Database
+- Supabase (PostgreSQL)
 
-Setup
-Clone the repository:
+## Deployment
+- GitHub
+- Netlify Continuous Deployment
 
-Bash
+---
+
+# 📋 Installation & Local Development
+
+## Prerequisites
+
+- Node.js v18 or higher
+- Netlify CLI
+
+```bash
+npm install -g netlify-cli
+```
+
+---
+
+## Setup
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/Ang3lhack/Proyectfin.git
 cd smartaura
-Install dependencies:
+```
 
-Bash
+### 2. Install Dependencies
+
+```bash
 npm install
-Configure Environment Variables:
-Create a .env file in the root directory:
+```
 
-Plaintext
+### 3. Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
 GEMINI_API_KEY=your_google_ai_studio_key_here
-Run the local development server:
+```
 
-Bash
+### 4. Run the Development Server
+
+```bash
 netlify dev
-Access the app at http://localhost:8888.
+```
 
-📖 User Guide
-Calibrate Sensors: Use the sliders to set the current temperature, humidity, and light levels of your room.
+The application will be available at:
 
-Visual Input (Optional): Upload a photo of your room so the AI can analyze the furniture style and color palette.
+```text
+http://localhost:8888
+```
 
-Analyze: Click "Execute Intelligent Analysis". The AI will process your local data, the outdoor Guadalajara weather, and your history to suggest a fragrance blend.
+---
 
-Train the AI: Use the 👍/👎 buttons. This data is saved to Supabase so the next recommendation is more aligned with your tastes.
+# 📖 User Guide
 
-Plan Ahead: Click "Weekly Shopping List" to get a 7-day fragrance plan based on the upcoming weather forecast.
+## 1. Calibrate Sensors
 
-🧠 Engineering Context
-As a Computer Engineering student, this project focuses on the intersection of Artificial Intelligence and Wellbeing Technology. The implementation explores how serverless architectures and multimodal LLMs can replace traditional hardware constraints in the research of human-environment interaction.
+Use the sliders to configure:
+- Temperature
+- Humidity
+- Light intensity
 
-Developed by: Angel Gael
+---
 
-Academic Year: 2026 - 4th Semester, Computer Engineering.
+## 2. Upload Room Image (Optional)
+
+Upload a room photo so the AI can analyze:
+- Furniture style
+- Color palette
+- Environmental aesthetics
+
+---
+
+## 3. Execute Intelligent Analysis
+
+Click:
+- **"Execute Intelligent Analysis"**
+or
+- **"Escanear Ambiente (Tiempo Real)"**
+
+The AI will process:
+- Sensor simulation data
+- Local weather conditions
+- User preference history
+
+Then it will generate a personalized fragrance recommendation.
+
+---
+
+## 4. Train the AI
+
+Use the 👍 / 👎 buttons after each recommendation.
+
+This feedback is stored in Supabase to improve future AI predictions.
+
+---
+
+## 5. Generate Weekly Planning
+
+Click:
+
+```text
+Generar Lista de Compras de la Semana
+```
+
+to receive:
+- A 7-day fragrance schedule
+- Suggested shopping lists
+- Weather-adapted recommendations
+
+---
+
+# 🧠 Engineering Context
+
+As a Computer Engineering project, SmartAura explores the intersection of:
+
+- Artificial Intelligence
+- IoT Simulation
+- Human-Environment Interaction
+- Wellbeing Technology
+- Serverless Computing
+
+The implementation demonstrates how multimodal LLMs and cloud-native architectures can replace traditional hardware limitations in experimental IoT environments.
+
+---
+
+# 👨‍💻 Developer
+
+**Developed by:** Angel Gael Garcia Ramos
+
+**Academic Year:** 2026 — 4th Semester, Computer Engineering
